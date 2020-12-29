@@ -1,0 +1,241 @@
+#+TITLE: Emacs configuration
+#+AUTHOR: Andreas Malmqvist
+#+STARTUP: content indent
+* Introduction
+  This is my literate emacs configuration.
+  Put the following in init.el to use this config.
+
+  #+BEGIN_SRC emacs-lisp :tangle no
+
+    (org-babel-load-file "path/to/this/file")
+
+  #+END_SRC
+  
+* Configuration
+** Default modes and options
+Emacs comes with alot of cool modes and options to configure.
+I like to have the emacs frame clean so therefor I remove the
+toolbar, menubar and scrollbar. We also remove that super annoying bell
+and opt out of the emacs welcome screen.
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq ring-bell-function 'ignore)
+  (setq inhibit-startup-screen t) 
+
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+
+#+END_SRC
+
+I also like to have emacs in fullscreen, and emacs comes with a battery-mode
+which displays the current battery status in the modeline. Let's also add
+a clock because it is fancy!
+
+#+BEGIN_SRC emacs-lisp
+
+  (display-battery-mode)
+  (display-time-mode)
+
+#+END_SRC
+
+** Package.el configuration
+To be able to install packages we need to require package.el which comes bundled
+with Emacs. Most packages in the emacs ecosystem are located in the melpa repositories
+so we want to add that to our package-archives list to.
+
+#+BEGIN_SRC emacs-lisp
+
+  (require 'package)
+  (setq package-archives '(("elpa" . "http://tromey.com/elpa/")
+                              ("gnu" . "http://elpa.gnu.org/packages/")
+                              ("melpa" . "https://melpa.org/packages/")))
+
+#+END_SRC
+
+To actually install packages we want to use use-package, which is a declarative
+package manager for emacs. So we just make sure that it is installed and also that
+our package-archives are up do date.
+
+#+BEGIN_SRC emacs-lisp
+
+  (package-initialize)
+
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+#+END_SRC
+
+Now that we have use-package installed, we can require it!
+
+#+BEGIN_SRC emacs-lisp
+
+  (require 'use-package)
+
+#+END_SRC
+
+** Packages
+*** Extra language modes
+Emacs comes with alot of language modes builtin, but I need more of them
+in my daily work. Lets install them using use-package!
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package go-mode :ensure t)
+  (use-package rust-mode :ensure t)
+  (use-package kotlin-mode :ensure t)
+  (use-package groovy-mode :ensure t)
+  (use-package markdown-mode :ensure t)
+
+#+END_SRC
+
+*** Git integration
+To interact with git, we use Magit. The one and only git ui for Emacs.
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package magit :ensure t)
+
+#+END_SRC
+
+*** Ido mode
+
+Ido mode is a builtin fuzzy finder for Emacs. It is used to fuzzy find files etc.
+By default it is shown as a horizontal list in the minibuffer, but i prefer a vertical
+list, which is provided by ido-vertical-mode
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package ido-vertical-mode
+    :ensure t
+    :init
+    (ido-mode)
+    (ido-vertical-mode))
+
+#+END_SRC
+
+By default ido-mode is not used for M-x, but thanks to its API, we can
+easily implement our own completion functions and hook them up to Emacs.
+
+#+BEGIN_SRC emacs-lisp
+
+  (defun custom/ido-mx-completion()
+    (interactive)
+    (call-interactively
+     (intern
+      (ido-completing-read
+       "M-x "
+       (all-completions "" obarray 'commandp)))))
+
+  (global-set-key (kbd "M-x") 'custom/ido-mx-completion)
+
+#+END_SRC
+
+*** LSP using eglot
+Eglot is one of several lsp client for emacs. Eglot, compared to lsp-mode, tries to use as much
+of the out-of-the-box apis as possible and thats why i like it. It does not feel like it is
+glued ontop of emacs, it feels more like a part of emacs itself.
+
+Eglot comes preconfigured with a bunch of lsp servers (although you must install the actual servers
+yourself) and more can be added by adding them to the list eglot-server-programs.
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package eglot
+    :ensure t
+    :hook
+    (go-mode . eglot-ensure)
+    (rust-mode . eglot-ensure)
+    (kotlin-mode . eglot-ensure))
+
+#+END_SRC
+
+*** Emacs lisp configuration
+In this section I list all the configuration and packages that i use to improve
+the experience when writing emacs-lisp.
+
+Paredit mode is a must have. It helps out with parens when writing lisp.
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package paredit
+    :ensure t
+    :hook (emacs-lisp-mode . paredit-mode))
+
+#+END_SRC
+
+*** Orgmode configuration
+Orgmode is one of the reasons that i actually chose to begin using Emacs.
+It is just excellent. In fact, this configuration file is written in orgmode!
+Org mode does not have to be installed however, it comes bundled with Emacs
+now a days.
+
+Following are some extra packages for orgmode and some configuration
+that makes it more beautiful.
+
+#+BEGIN_SRC emacs-lisp
+
+  (setq org-agenda-files '("~/Documents/todos.org"))    ; Sets the files that agenda will know about
+  (setq org-default-notes-file "~/Documents/todos.org") ; Sets the default file for org-capture
+
+  (use-package org-bullets
+    :ensure t
+    :hook
+    (org-mode . org-bullets-mode))
+
+#+END_SRC
+
+*** Theming stuff
+
+TODO Document this
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package doom-modeline
+    :ensure t
+    :init
+    (doom-modeline-mode))
+
+  (use-package all-the-icons-dired
+    :ensure t
+    :hook
+    (dired-mode . all-the-icons-dired-mode))
+
+  (use-package all-the-icons-ibuffer
+    :ensure t
+    :hook
+    (ibuffer-mode . all-the-icons-ibuffer-mode))
+
+  (use-package dracula-theme
+    :ensure t
+    :config
+    (load-theme 'dracula t))
+
+  (set-frame-font "Iosevka SS08 SemiBold 13")
+
+  (use-package nyan-mode
+    :ensure t
+    :init
+    (nyan-mode)
+    (nyan-start-animation))
+
+#+END_SRC
+
+
+** TODO Separate this
+   #+BEGIN_SRC emacs-lisp
+
+
+     (setq package-list '(			; Packages to install
+                          exec-path-from-shell ; Makes sure that emacs knows about the shell env ($PATH etc)
+                          ido-vertical-mode))
+
+     (add-hook 'after-init-hook 'exec-path-from-shell-initialize)
+
+     (load-theme 'dracula t)
+
+#+END_SRC
