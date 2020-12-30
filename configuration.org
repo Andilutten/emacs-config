@@ -35,6 +35,7 @@ a clock because it is fancy!
 
 #+BEGIN_SRC emacs-lisp
 
+  (setq display-time-format " %H:%M")
   (display-battery-mode)
   (display-time-mode)
 
@@ -225,6 +226,35 @@ TODO Document this
 
 #+END_SRC
 
+*** Exwm configuration
+Emacs truly is an operating system in its own right and the package exwm
+allows emacs to be used as a window manager under x11.
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package exwm
+    :ensure t
+    :init
+    (require 'exwm-config)
+    (require 'exwm-systemtray)
+    (exwm-config-example)
+    (exwm-systemtray-enable)
+    (exwm-init))
+
+#+END_SRC
+
+I also want to be able to use caps-lock as a control key (otherwise my
+pinky gets mad at me when using Emacs). To do this we use setxkbmap.
+
+#+BEGIN_SRC emacs-lisp
+
+  (defun wm-setxkbmap()
+    (call-process "setxkbmap" nil (get-buffer-create "wm") nil
+                  "-option" "caps:ctrl_modifier")
+
+  (wm-setxkbmap)
+
+#+END_SRC
 
 ** TODO Separate this
    #+BEGIN_SRC emacs-lisp
