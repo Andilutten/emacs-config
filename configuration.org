@@ -41,6 +41,15 @@ a clock because it is fancy!
 
 #+END_SRC
 
+By default, emacs will simulate stty-stop on C-x C-z, which is super annoying..
+Thats why we unbind the key.
+
+#+BEGIN_SRC emacs-lisp
+
+(unbind-key (kbd "C-x C-z"))
+
+#+END_SRC
+
 ** Package.el configuration
 To be able to install packages we need to require package.el which comes bundled
 with Emacs. Most packages in the emacs ecosystem are located in the melpa repositories
@@ -250,7 +259,7 @@ pinky gets mad at me when using Emacs). To do this we use setxkbmap.
 
   (defun wm-setxkbmap()
     (call-process "setxkbmap" nil (get-buffer-create "wm") nil
-                  "-option" "caps:ctrl_modifier")
+                  "-option" "caps:ctrl_modifier"))
 
   (wm-setxkbmap)
 
