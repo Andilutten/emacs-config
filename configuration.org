@@ -101,6 +101,18 @@ modes. In this case i want to display line numbers to all prog mode buffers.
 
 #+END_SRC
 
+*** Vterm
+The built in terminals in Emacs are... ok, but since I got here from a tmux/vim
+setup, I am very dependent on a good terminal emulator to do my work properly.
+Thats where vterm comes in. Vterm is a package for Emacs that uses the same underlying
+terminal library that neovim uses, and it is super awesome.
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package vterm :ensure t)
+
+#+END_SRC
+
 *** Extra language modes
 Emacs comes with alot of language modes builtin, but I need more of them
 in my daily work. Lets install them using use-package!
