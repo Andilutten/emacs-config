@@ -89,6 +89,18 @@ Now that we have use-package installed, we can require it!
 #+END_SRC
 
 ** Packages
+
+*** Prog mode
+Emacs has a special mode that acts as a base for all programming modes, called prog
+mode. With this mode we can add configuration that should be used to all programming
+modes. In this case i want to display line numbers to all prog mode buffers.
+
+#+BEGIN_SRC emacs-lisp
+
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+#+END_SRC
+
 *** Extra language modes
 Emacs comes with alot of language modes builtin, but I need more of them
 in my daily work. Lets install them using use-package!
