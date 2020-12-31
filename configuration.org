@@ -30,13 +30,10 @@ and opt out of the emacs welcome screen.
 #+END_SRC
 
 I also like to have emacs in fullscreen, and emacs comes with a battery-mode
-which displays the current battery status in the modeline. Let's also add
-a clock because it is fancy!
+which displays the current battery status in the modeline. 
 
 #+BEGIN_SRC emacs-lisp
 
-  (setq display-time-format " %H:%M")
-  (display-battery-mode)
   (display-time-mode)
 
 #+END_SRC
@@ -260,19 +257,43 @@ TODO Document this
 #+END_SRC
 
 *** Exwm configuration
+
 Emacs truly is an operating system in its own right and the package exwm
 allows emacs to be used as a window manager under x11.
 
 #+BEGIN_SRC emacs-lisp
 
-  (use-package exwm
-    :ensure t
-    :init
-    (require 'exwm-config)
-    (require 'exwm-systemtray)
-    (exwm-config-example)
-    (exwm-systemtray-enable)
-    (exwm-init))
+  (use-package exwm :ensure t)
+
+  (require 'exwm)
+  (require 'exwm-config)
+  (require 'exwm-systemtray)
+  (require 'exwm-randr)
+
+  (exwm-config-example)
+  (exwm-systemtray-enable)
+  (setq exwm-randr-workspace-output-plist '(0 "DP-2"))
+
+  (defun exwm-change-screen-hook ()
+    (let ((xrandr-output-regexp "\n\\([^ ]+\\) connected ")
+          default-output)
+      (with-temp-buffer
+        (call-process "xrandr" nil t nil)
+        (goto-char (point-min))
+        (re-search-forward xrandr-output-regexp nil 'noerror)
+        (setq default-output (match-string 1))
+        (forward-line)
+        (if (not (re-search-forward xrandr-output-regexp nil 'noerror))
+            (call-process "xrandr" nil nil nil "--output" default-output "--auto")
+          (call-process
+           "xrandr" nil nil nil
+           "--output" (match-string 1) "--primary" "--auto"
+           "--output" default-output "--off")
+          (setq exwm-randr-workspace-output-plist (list 0 (match-string 1)))))))
+
+  (add-hook 'exwm-randr-screen-change-hook 'exwm-change-screen-hook)
+  (exwm-randr-enable)
+  (exwm-init)
 
 #+END_SRC
 
