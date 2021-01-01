@@ -34,7 +34,7 @@ which displays the current battery status in the modeline.
 
 #+BEGIN_SRC emacs-lisp
 
-  (display-time-mode)
+  (display-battery-mode)
 
 #+END_SRC
 
