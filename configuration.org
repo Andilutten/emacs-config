@@ -310,6 +310,18 @@ pinky gets mad at me when using Emacs). To do this we use setxkbmap.
 
 #+END_SRC
 
+Out of the box, exwm does not handle media keys, brightness keys and etc.
+This can be easily added though with the package desktop-environment.
+
+#+BEGIN_SRC emacs-lisp
+
+  (use-package desktop-environment
+    :ensure t
+    :init
+    (desktop-environment-mode))
+
+#+END_SRC
+
 ** TODO Separate this
    #+BEGIN_SRC emacs-lisp
 
