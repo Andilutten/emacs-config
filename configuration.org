@@ -133,36 +133,25 @@ To interact with git, we use Magit. The one and only git ui for Emacs.
 
 #+END_SRC
 
-*** Ido mode
-
-Ido mode is a builtin fuzzy finder for Emacs. It is used to fuzzy find files etc.
-By default it is shown as a horizontal list in the minibuffer, but i prefer a vertical
-list, which is provided by ido-vertical-mode
+*** Ivy
 
 #+BEGIN_SRC emacs-lisp
 
-  (use-package ido-vertical-mode
+  (use-package ivy
     :ensure t
-    :init
-    (ido-mode)
-    (ido-vertical-mode))
+    :config
+    (ivy-mode))
 
 #+END_SRC
 
-By default ido-mode is not used for M-x, but thanks to its API, we can
-easily implement our own completion functions and hook them up to Emacs.
+*** Avy
 
 #+BEGIN_SRC emacs-lisp
 
-  (defun custom/ido-mx-completion()
-    (interactive)
-    (call-interactively
-     (intern
-      (ido-completing-read
-       "M-x "
-       (all-completions "" obarray 'commandp)))))
-
-  (global-set-key (kbd "M-x") 'custom/ido-mx-completion)
+  (use-package avy
+    :ensure t
+    :bind (("M-g g" . avy-goto-line)
+           ("M-g c" . avy-goto-char)))
 
 #+END_SRC
 
@@ -246,7 +235,8 @@ TODO Document this
     :config
     (load-theme 'dracula t))
 
-  (set-frame-font "Iosevka SS08 SemiBold 13")
+  (add-to-list 'default-frame-alist '(alpha . 85))
+  (add-to-list 'default-frame-alist '(font . "Fantasque Sans Mono Bold 13"))
 
   (use-package nyan-mode
     :ensure t
